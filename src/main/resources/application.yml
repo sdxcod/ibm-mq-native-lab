@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: ibm-mq-native-lab
+  main:
+    web-application-type: none
+    banner-mode: off
+logging:
+  level:
+    root: WARN
+lab:
+  command: help
+  queue: in
+  message: Hello from dev.sdxcod
+  outcome: commit
+  wait: 3s
+  mq:
+    host: ${LAB_MQ_HOST:localhost}
+    port: ${LAB_MQ_PORT:1414}
+    queue-manager: ${LAB_MQ_QMGR:QM1}
+    channel: ${LAB_MQ_CHANNEL:DEV.APP.SVRCONN}
+    user: ${LAB_MQ_USER:app}
+    password: ${LAB_MQ_PASSWORD:}
+    password-file: ${LAB_MQ_PASSWORD_FILE:.secrets/mqAppPassword}
+    in-queue: ${LAB_MQ_IN_QUEUE:DEV.LAB.IN}
+    out-queue: ${LAB_MQ_OUT_QUEUE:DEV.LAB.OUT}
+    test-queue: ${LAB_MQ_TEST_QUEUE:DEV.LAB.TEST}
+    max-payload-bytes: 1048576

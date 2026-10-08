@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: native-mq-demo
+  namespace: ibm-mq-lab
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 120
+  template:
+    spec:
+      restartPolicy: Never
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+      containers:
+        - name: agent
+          image: ibm-mq-native-lab:0.1.0
+          imagePullPolicy: Never
+          args: ["--lab.command=demo"]
+          env:
+            - {name: LAB_MQ_HOST, value: mq}
+            - {name: LAB_MQ_PASSWORD_FILE, value: /run/secrets/mqAppPassword}
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: "1", memory: 512Mi}
+          volumeMounts:
+            - {name: passwords, mountPath: /run/secrets, readOnly: true}
+      volumes:
+        - name: passwords
+          secret:
+            secretName: mq-lab-passwords
+            defaultMode: 0444
+            items:
+              - {key: mqAppPassword, path: mqAppPassword}

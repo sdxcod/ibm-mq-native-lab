@@ -1,0 +1,45 @@
+name: ibm-mq-native-lab
+services:
+  mq:
+    image: icr.io/ibm-messaging/mq:9.4.0.25-r2
+    platform: linux/amd64
+    environment:
+      LICENSE: accept
+      MQ_QMGR_NAME: QM1
+      MQ_DEV: "true"
+      MQ_CONNAUTH_USE_HTP: "true"
+    ports:
+      - "127.0.0.1:1414:1414"
+      - "127.0.0.1:9443:9443"
+    volumes:
+      - mq-data:/mnt/mqm
+      - ./docker/mq/20-lab.mqsc:/etc/mqm/20-lab.mqsc:ro
+    secrets:
+      - mqAppPassword
+      - mqAdminPassword
+    healthcheck:
+      test: ["CMD", "chkmqready"]
+      interval: 10s
+      timeout: 5s
+      start_period: 40s
+      retries: 30
+  agent:
+    profiles: [app]
+    image: ibm-mq-native-lab:0.1.0
+    build: .
+    environment:
+      LAB_MQ_HOST: mq
+      LAB_MQ_PASSWORD_FILE: /run/secrets/mqAppPassword
+    secrets:
+      - mqAppPassword
+    depends_on:
+      mq:
+        condition: service_healthy
+    command: ["--lab.command=demo"]
+volumes:
+  mq-data:
+secrets:
+  mqAppPassword:
+    file: ./.secrets/mqAppPassword
+  mqAdminPassword:
+    file: ./.secrets/mqAdminPassword
