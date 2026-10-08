@@ -67,3 +67,45 @@ quit
 docker compose --profile app build agent
 docker compose --profile app run --rm agent
 ```
+
+## ارزیابی صف IBM MQ Web Console
+
+باز کردن آدرس زیر در مرورگر:
+
+https://localhost:9443/ibmmq/console
+
+اطلاعات ورود:
+- Username: admin
+- Password: مقدار فایل .secrets/mqAdminPassword
+
+ممکن است مرورگر بابت گواهی HTTPS هشدار بدهد؛ کنسول محلی از گواهی self-signed استفاده می‌کند.
+
+پس از ورود، Queue Manager با نام QM1 و قسمت Queues را باز کنید. صف‌های آزمایشگاه عبارت‌اند از:
+
+| صف           | کاربرد                             |
+|--------------|------------------------------------|
+| DEV.LAB.IN   | آزمایش پیام‌های ورودی              |
+| DEV.LAB.OUT  | آزمایش پیام‌های خروجی              |
+| DEV.LAB.TEST | سناریوی demo و تست‌های integration |
+
+برای مشاهدهٔ اثر دستورها، این آزمایش را انجام دهید:
+
+```bash
+./scripts/lab.sh send --lab.queue=in --lab.message='Hello dashboard'
+```
+
+سپس اطلاعات صف DEV.LAB.IN را در کنسول refresh کنید و Current depth را ببینید. بعد اجرا کنید:
+
+```shell
+./scripts/lab.sh receive --lab.queue=in
+```
+
+و دوباره refresh کنید تا اثر دریافت و commit را مشاهده کنید.
+
+کنسول وضعیت صف را نشان می‌دهد؛ تاریخچهٔ دستورهای CLI برنامه را نمایش نمی‌دهد. برای دنبال کردن نتیجهٔ هر دستور، خروجی ترمینال برنامه را کنار کنسول ببینید. برای بررسی خطاهای سمت MQ هم استفاده کنید:
+
+```shell
+docker compose logs -f mq
+```
+
+برای آزمایش commit/backout از shell تعاملی استفاده کنید؛ تغییر عمق صف در زمان تراکنش‌های باز، به‌تنهایی نشان‌دهندهٔ قطعی شدن ارسال یا دریافت نیست.
