@@ -1,7 +1,3 @@
-# Verification record
-
-Prepared on 2026-10-08.
-
 ## Executed successfully
 
 - Built with Java 21 and Maven 3.9.9, including the generated Maven Wrapper (`./mvnw verify`). Spring Boot 4.1.1 and IBM MQ allclient 9.4.0.25 resolved from Maven Central.
